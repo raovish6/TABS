@@ -162,7 +162,7 @@ if __name__ == '__main__':
     model = TABS()
 
     # load directory
-    load_dir = '/media/sail/HDD14T/Vish_Models/best_model_restransunet_ixi.pth'
+    load_dir = ''
 
     checkpoint = torch.load(load_dir, map_location=torch.device(args.gpu))
     model.load_state_dict(checkpoint['state_dict'])
