@@ -1,7 +1,7 @@
 # TABS
 TABS: Transformer-based Automated Brain Tissue Segmentation
 
-The associated pre-print can be found here: https://arxiv.org/abs/2201.0874
+The associated pre-print can be found here: https://arxiv.org/abs/2201.08741
 
 This repository contains the code for TABS, a 3D CNN-Transformer hybrid automated brain tissue segmentation algorithm using T1w structural MRI scans. TABS relies on a Res-Unet backbone, with a Vision Transformer embedded between the encoder and decoder layers.
 
