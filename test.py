@@ -30,6 +30,8 @@ parser.add_argument('--test_fold', default=1, type=int)
 
 parser.add_argument('--gpu', default=0, type=int)
 
+parser.add_argument('--load_dir', default='', type=str)
+
 args = parser.parse_args()
 
 def get_loss(model, criterion, mri_images, targets, mode):
@@ -161,10 +163,7 @@ if __name__ == '__main__':
 
     model = TABS()
 
-    # load directory
-    load_dir = ''
-
-    checkpoint = torch.load(load_dir, map_location=torch.device(args.gpu))
+    checkpoint = torch.load(args.load_dir, map_location=torch.device(args.gpu))
     model.load_state_dict(checkpoint['state_dict'])
     model.cuda(args.gpu)
 
