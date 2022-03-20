@@ -20,4 +20,4 @@ If you would like to apply TABS to your own dataset, please pre-process the T1w 
 3. Intensity normalization to a range of -1 to 1
 4. Padding/Cropping to 192x192x192
 
-Afterwards, you may use the train and test scripts provided, by changing the arguments and providing your own dataset/dataloader. We have provided pretrained models corresponding to each of the datasets mentioned in the preprint, which can be readily applied.
+Afterwards, you may use the train and test scripts provided, by changing the arguments and providing your own dataset/dataloader.
