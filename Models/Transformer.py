@@ -1,16 +1,4 @@
 import torch.nn as nn
-import torch
-
-class LearnedPositionalEncoding(nn.Module):
-    def __init__(self, max_position_embeddings, embedding_dim, seq_length):
-        super(LearnedPositionalEncoding, self).__init__()
-
-        self.position_embeddings = nn.Parameter(torch.zeros(1, seq_length, embedding_dim)) #8x
-
-    def forward(self, x, position_ids=None):
-
-        position_embeddings = self.position_embeddings
-        return x + position_embeddings
 
 class IntermediateSequential(nn.Sequential):
     def __init__(self, *args, return_intermediate=True):
@@ -53,7 +41,7 @@ class SelfAttention(nn.Module):
             qkv[0],
             qkv[1],
             qkv[2],
-        )
+        )  # make torchscript happy (cannot use tensor as tuple)
 
         attn = (q @ k.transpose(-2, -1)) * self.scale
         attn = attn.softmax(dim=-1)
@@ -137,7 +125,9 @@ class TransformerModel(nn.Module):
                     ),
                 ]
             )
+            # dim = dim / 2
         self.net = IntermediateSequential(*layers)
+
 
     def forward(self, x):
         return self.net(x)
