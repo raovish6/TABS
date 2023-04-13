@@ -1,4 +1,3 @@
-# Import stuff
 import argparse
 import os
 import random
@@ -20,33 +19,20 @@ from Models.TABS_Model import TABS
 local_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 parser = argparse.ArgumentParser()
-
 parser.add_argument('--date', default=local_time.split(' ')[0], type=str)
-
 # Root directory
 parser.add_argument('--root', default='', type=str)
-
 # learning rate
 parser.add_argument('--lr', default=0.00001, type=float)
-
 parser.add_argument('--weight_decay', default=1e-5, type=float)
-
 parser.add_argument('--amsgrad', default=True, type=bool)
-
 parser.add_argument('--seed', default=1000, type=int)
-
 parser.add_argument('--no_cuda', default=False, type=bool)
-
 parser.add_argument('--num_workers', default=4, type=int)
-
 parser.add_argument('--batch_size', default=3, type=int)
-
 parser.add_argument('--start_epoch', default=0, type=int)
-
 parser.add_argument('--end_epoch', default=2, type=int)
-
 parser.add_argument('--gpu', default=2, type=int)
-
 parser.add_argument('--gpu_available', default='0,1,2', type=str)
 
 args = parser.parse_args()

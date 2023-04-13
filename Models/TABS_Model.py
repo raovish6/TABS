@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from Transformer import TransformerModel
-from PositionalEncoding import LearnedPositionalEncoding
+from .Transformer import TransformerModel
+from .PositionalEncoding import LearnedPositionalEncoding
 
 class up_conv_3D(nn.Module):
     def __init__(self, ch_in, ch_out):
@@ -69,7 +69,7 @@ class TABS(nn.Module):
         ):
         super(TABS,self).__init__()
 
-        self.hidden_dim = (img_dim/16)**3,
+        self.hidden_dim = int((img_dim/16)**3)
 
         self.Maxpool = nn.MaxPool3d(kernel_size=2,stride=2)
         self.Conv1 = resconv_block_3D(ch_in=img_ch,ch_out=8)
@@ -95,7 +95,7 @@ class TABS(nn.Module):
         self.num_patches = int((img_dim // patch_dim) ** 3)
 
         self.position_encoding = LearnedPositionalEncoding(
-            embedding_dim, hidden_dim
+            embedding_dim, self.hidden_dim
         )
 
         self.reshaped_conv = conv_block_3D(512, 128)
@@ -104,7 +104,7 @@ class TABS(nn.Module):
             embedding_dim,
             num_layers,
             num_heads,
-            hidden_dim,
+            self.hidden_dim,
 
             dropout_rate,
             attn_dropout_rate,
