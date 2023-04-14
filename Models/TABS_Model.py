@@ -60,7 +60,7 @@ class TABS(nn.Module):
         img_dim = 192,
         patch_dim = 8,
         img_ch = 1,
-        output_ch = 1,
+        output_ch = 3,
         embedding_dim = 512,
         num_heads = 8,
         num_layers = 4,
