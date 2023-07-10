@@ -4,13 +4,13 @@ import torch.nn.functional as F
 
 from Transformer import TransformerModel
 from PositionalEncoding import LearnedPositionalEncoding
-
-class up_conv_3D(nn.Module):
+    
+class up_conv(nn.Module):
     def __init__(self, ch_in, ch_out):
-        super(up_conv_3D, self).__init__()
+        super(up_conv, self).__init__()
         self.up = nn.Sequential(
             nn.Upsample(scale_factor = 2),
-            nn.Conv3d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
+            nn.Conv2d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
             nn.GroupNorm(8, ch_out),
             nn.ReLU(inplace = True)
         )
@@ -18,15 +18,15 @@ class up_conv_3D(nn.Module):
     def forward(self,x):
         x = self.up(x)
         return x
-
-class conv_block_3D(nn.Module):
+    
+class conv_block(nn.Module):
     def __init__(self, ch_in, ch_out):
-        super(conv_block_3D, self).__init__()
+        super(conv_block, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv3d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
+            nn.Conv2d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
             nn.GroupNorm(8, ch_out),
             nn.ReLU(inplace = True),
-            nn.Conv3d(ch_out, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
+            nn.Conv2d(ch_out, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
             nn.GroupNorm(8, ch_out),
             nn.ReLU(inplace = True)
         )
@@ -35,23 +35,24 @@ class conv_block_3D(nn.Module):
         x = self.conv(x)
         return x
 
-class resconv_block_3D(nn.Module):
+class resconv_block(nn.Module):
     def __init__(self, ch_in, ch_out):
-        super(resconv_block_3D, self).__init__()
+        super(resconv_block, self).__init__()
         self.conv = nn.Sequential(
-            nn.Conv3d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
+            nn.Conv2d(ch_in, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
             nn.GroupNorm(8, ch_out),
             nn.ReLU(inplace = True),
-            nn.Conv3d(ch_out, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
+            nn.Conv2d(ch_out, ch_out, kernel_size = 3, stride = 1, padding = 1, bias = True),
             nn.GroupNorm(8, ch_out),
             nn.ReLU(inplace = True)
         )
-        self.Conv_1x1 = nn.Conv3d(ch_in, ch_out, kernel_size = 1, stride = 1, padding = 0)
+        self.Conv_1x1 = nn.Conv2d(ch_in, ch_out, kernel_size = 1, stride = 1, padding = 0)
 
     def forward(self,x):
-
-        residual = self.Conv_1x1(x)
+        
+        residual =  self.Conv_1x1(x)
         x = self.conv(x)
+        
         return residual + x
 
 class TABS(nn.Module):
@@ -69,25 +70,25 @@ class TABS(nn.Module):
         ):
         super(TABS,self).__init__()
 
-        self.hidden_dim = int((img_dim/16)**3)
+        self.hidden_dim = int((img_dim/16)**2)
 
-        self.Maxpool = nn.MaxPool3d(kernel_size=2,stride=2)
-        self.Conv1 = resconv_block_3D(ch_in=img_ch,ch_out=8)
-        self.Conv2 = resconv_block_3D(ch_in=8,ch_out=16)
-        self.Conv3 = resconv_block_3D(ch_in=16,ch_out=32)
-        self.Conv4 = resconv_block_3D(ch_in=32,ch_out=64)
-        self.Conv5 = resconv_block_3D(ch_in=64,ch_out=128)
+        self.Maxpool = nn.MaxPool2d(kernel_size = 2, stride = 2)
+        self.Conv1 = resconv_block(ch_in=img_ch,ch_out=8)
+        self.Conv2 = resconv_block(ch_in=8,ch_out=16)
+        self.Conv3 = resconv_block(ch_in=16,ch_out=32)
+        self.Conv4 = resconv_block(ch_in=32,ch_out=64)
+        self.Conv5 = resconv_block(ch_in=64,ch_out=128)
 
-        self.Up5 = up_conv_3D(ch_in=128,ch_out=64)
-        self.Up_conv5 = resconv_block_3D(ch_in=128, ch_out=64)
-        self.Up4 = up_conv_3D(ch_in=64,ch_out=32)
-        self.Up_conv4 = resconv_block_3D(ch_in=64, ch_out=32)
-        self.Up3 = up_conv_3D(ch_in=32,ch_out=16)
-        self.Up_conv3 = resconv_block_3D(ch_in=32, ch_out=16)
-        self.Up2 = up_conv_3D(ch_in=16,ch_out=8)
-        self.Up_conv2 = resconv_block_3D(ch_in=16, ch_out=8)
+        self.Up5 = up_conv(ch_in=128,ch_out=64)
+        self.Up_conv5 = resconv_block(ch_in=128, ch_out=64)
+        self.Up4 = up_conv(ch_in=64,ch_out=32)
+        self.Up_conv4 = resconv_block(ch_in=64, ch_out=32)
+        self.Up3 = up_conv(ch_in=32,ch_out=16)
+        self.Up_conv3 = resconv_block(ch_in=32, ch_out=16)
+        self.Up2 = up_conv(ch_in=16,ch_out=8)
+        self.Up_conv2 = resconv_block(ch_in=16, ch_out=8)
 
-        self.Conv_1x1 = nn.Conv3d(8,output_ch,kernel_size=1,stride=1,padding=0)
+        self.Conv_1x1 = nn.Conv2d(8,output_ch,kernel_size=1,stride=1,padding=0)
         self.gn = nn.GroupNorm(8, 128)
         self.relu = nn.ReLU(inplace=True)
         self.act = nn.Softmax(dim=1)
@@ -98,7 +99,7 @@ class TABS(nn.Module):
             embedding_dim, self.hidden_dim
         )
 
-        self.reshaped_conv = conv_block_3D(512, 128)
+        self.reshaped_conv = conv_block(512, 128)
 
         self.transformer = TransformerModel(
             embedding_dim,
@@ -110,7 +111,7 @@ class TABS(nn.Module):
             attn_dropout_rate,
         )
 
-        self.conv_x = nn.Conv3d(
+        self.conv_x = nn.Conv2d(
             128,
             embedding_dim,
             kernel_size=3,
@@ -141,8 +142,8 @@ class TABS(nn.Module):
         x = self.gn(x)
         x = self.relu(x)
         x = self.conv_x(x)
-        print(x.shape)
-        x = x.permute(0, 2, 3, 4, 1).contiguous()
+
+        x = x.permute(0, 2, 3, 1).contiguous()
         x = x.view(x.size(0), -1, self.embedding_dim)
 
         x = self.position_encoding(x)
@@ -188,21 +189,19 @@ class TABS(nn.Module):
             x.size(0),
             int(self.img_dim//2 / self.patch_dim),
             int(self.img_dim//2 / self.patch_dim),
-            int(self.img_dim//2 / self.patch_dim),
             self.embedding_dim,
         )
-        x = x.permute(0, 4, 1, 2, 3).contiguous()
+        x = x.permute(0, 3, 1, 2).contiguous()
 
         return x
 
 if __name__ == '__main__':
 
-    model = TABS()
     device = torch.device('mps')
-
-    test = torch.rand([1,1,192,192,192])
-    # test = test.to(device)
-    # model = model.to(device)
+    model = TABS()
+    test = torch.rand([1,1,192,192])
+    test = test.to(device)
+    model = model.to(device)
 
     with torch.no_grad():
         out = model(test)
